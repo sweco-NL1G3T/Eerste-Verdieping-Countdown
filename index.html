@@ -564,6 +564,90 @@
             .cd-num.flip, .status-dot, .eyebrow-dot { animation: none; }
             .progress-fill { transition: none; }
         }
+
+        /* ── EASTER EGG ──────────────────────────────────── */
+        #easter-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            background: rgba(0, 18, 8, 0.88);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #easter-modal.show { display: flex; }
+
+        .easter-box {
+            background: var(--green-deep);
+            border: 1px solid rgba(0,166,81,0.28);
+            border-radius: 20px;
+            padding: 20px 20px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.7);
+            max-width: 100%;
+        }
+
+        .easter-header {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .easter-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--white);
+        }
+
+        .easter-close {
+            background: rgba(255,255,255,0.07);
+            border: none;
+            color: rgba(255,255,255,0.55);
+            font-size: 1.3rem;
+            line-height: 1;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.18s, color 0.18s;
+            flex-shrink: 0;
+        }
+        .easter-close:hover { background: rgba(255,255,255,0.14); color: var(--white); }
+
+        .easter-hud {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.45);
+            display: flex;
+            gap: 20px;
+            width: 100%;
+        }
+        .easter-hud b { color: var(--green); font-weight: 700; }
+
+        #breakout {
+            border-radius: 12px;
+            display: block;
+            max-width: 100%;
+        }
+
+        .easter-hint {
+            font-family: 'Open Sans', sans-serif;
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.3);
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -580,7 +664,7 @@
             <div class="header-meta-bot">1e Verdieping</div>
         </div>
     </div>
-    <div class="status-pill" aria-label="Status: In renovatie">
+    <div class="status-pill" id="status-pill" aria-label="Status: In renovatie" role="button" tabindex="0" style="cursor:pointer">
         <span class="status-dot" aria-hidden="true"></span>
         In Renovatie
     </div>
@@ -672,9 +756,9 @@
         ></div>
     </div>
     <div class="progress-dates">
-        <span>28 april 2026</span>
+        <span>28 apr 2026</span>
         <span class="center" id="days-left-txt" aria-live="polite"></span>
-        <span>27 juli 2026</span>
+        <span>27 jul 2026</span>
     </div>
 </section>
 
@@ -757,6 +841,22 @@
     <div class="footer-copy">&copy; 2026 Sweco Nederland B.V. &mdash; Kantoor Alkmaar</div>
 </footer>
 
+<!-- ── EASTER EGG ─────────────────────────────────────────── -->
+<div id="easter-modal" role="dialog" aria-modal="true" aria-labelledby="easter-title-lbl">
+    <div class="easter-box">
+        <div class="easter-header">
+            <div class="easter-title" id="easter-title-lbl">Verbouw de 1e Verdieping!</div>
+            <button class="easter-close" id="easter-close" aria-label="Sluiten">&times;</button>
+        </div>
+        <div class="easter-hud">
+            <span>Score: <b id="eg-score">0</b></span>
+            <span>Levens: <b id="eg-lives">&#9632;&#9632;&#9632;</b></span>
+        </div>
+        <canvas id="breakout" width="400" height="300"></canvas>
+        <div class="easter-hint">Pijltjestoetsen of muis &nbsp;&bull;&nbsp; R = opnieuw &nbsp;&bull;&nbsp; Esc = sluiten</div>
+    </div>
+</div>
+
 <script>
 (function () {
     'use strict';
@@ -833,6 +933,173 @@
 
     tick();
     timer = setInterval(tick, 1000);
+}());
+
+// ── EASTER EGG: BRICK BREAKER ────────────────────────────
+(function () {
+    var keys = {};
+    var raf, gameState;
+
+    var modal    = document.getElementById('easter-modal');
+    var closeBtn = document.getElementById('easter-close');
+    var canvas   = document.getElementById('breakout');
+    var ctx      = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+
+    var ROWS = 5, COLS = 8;
+    var BW = 44, BH = 14, BP = 4, BOT = 20, BOL = 12;
+    var ROW_COLORS = ['#00C962','#00A651','#008040','#006B35','#004D26'];
+    var LIVES_ICONS = ['','&#9632;','&#9632;&#9632;','&#9632;&#9632;&#9632;'];
+
+    var ball, paddle, bricks, score, lives;
+
+    function init() {
+        score = 0; lives = 3; gameState = 'playing';
+        document.getElementById('eg-score').textContent = '0';
+        document.getElementById('eg-lives').innerHTML = LIVES_ICONS[3];
+
+        ball   = { x: W/2, y: H-65, dx: 3.6, dy: -3.6, r: 7 };
+        paddle = { x: W/2-45, y: H-26, w: 90, h: 12 };
+
+        bricks = [];
+        for (var r = 0; r < ROWS; r++) {
+            for (var c = 0; c < COLS; c++) {
+                bricks.push({
+                    x: BOL + c*(BW+BP),
+                    y: BOT + r*(BH+BP),
+                    alive: true, color: ROW_COLORS[r]
+                });
+            }
+        }
+    }
+
+    function rr(x, y, w, h, rad) {
+        ctx.beginPath();
+        ctx.moveTo(x+rad,y);
+        ctx.lineTo(x+w-rad,y); ctx.quadraticCurveTo(x+w,y,x+w,y+rad);
+        ctx.lineTo(x+w,y+h-rad); ctx.quadraticCurveTo(x+w,y+h,x+w-rad,y+h);
+        ctx.lineTo(x+rad,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-rad);
+        ctx.lineTo(x,y+rad); ctx.quadraticCurveTo(x,y,x+rad,y);
+        ctx.closePath();
+    }
+
+    function drawOverlay(title, sub) {
+        ctx.fillStyle = 'rgba(0,18,8,0.82)';
+        ctx.fillRect(0,0,W,H);
+        ctx.textAlign = 'center';
+        ctx.font = 'bold 26px Poppins,sans-serif';
+        ctx.fillStyle = '#00A651';
+        ctx.fillText(title, W/2, H/2-14);
+        ctx.font = '13px Open Sans,sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.fillText(sub, W/2, H/2+16);
+        ctx.textAlign = 'left';
+    }
+
+    function draw() {
+        ctx.fillStyle = '#002D1A'; ctx.fillRect(0,0,W,H);
+
+        bricks.forEach(function(b) {
+            if (!b.alive) return;
+            ctx.fillStyle = b.color;
+            rr(b.x, b.y, BW, BH, 4); ctx.fill();
+            ctx.fillStyle = 'rgba(255,255,255,0.12)';
+            rr(b.x+1, b.y+1, BW-2, 4, 2); ctx.fill();
+        });
+
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
+        ctx.fillStyle = '#ffffff'; ctx.fill();
+
+        var grad = ctx.createLinearGradient(paddle.x, paddle.y, paddle.x, paddle.y+paddle.h);
+        grad.addColorStop(0, '#00C962'); grad.addColorStop(1, '#006B35');
+        ctx.fillStyle = grad;
+        rr(paddle.x, paddle.y, paddle.w, paddle.h, 6); ctx.fill();
+
+        if (gameState === 'won')  drawOverlay('Gerenoveerd!', 'R = opnieuw spelen');
+        if (gameState === 'lost') drawOverlay('Helaas...', 'R = opnieuw proberen');
+    }
+
+    function update() {
+        if (gameState !== 'playing') { draw(); raf = requestAnimationFrame(update); return; }
+
+        if (keys[37] && paddle.x > 0)            paddle.x -= 6;
+        if (keys[39] && paddle.x+paddle.w < W)   paddle.x += 6;
+
+        ball.x += ball.dx; ball.y += ball.dy;
+
+        if (ball.x-ball.r < 0 || ball.x+ball.r > W) ball.dx = -ball.dx;
+        if (ball.y-ball.r < 0) ball.dy = -ball.dy;
+
+        if (ball.y+ball.r > H) {
+            lives--;
+            document.getElementById('eg-lives').innerHTML = LIVES_ICONS[Math.max(0,lives)];
+            if (lives <= 0) { gameState = 'lost'; }
+            else { ball.x = W/2; ball.y = H-65; ball.dx = 3.6; ball.dy = -3.6; }
+        }
+
+        if (ball.y+ball.r >= paddle.y && ball.y-ball.r <= paddle.y+paddle.h &&
+            ball.x >= paddle.x && ball.x <= paddle.x+paddle.w && ball.dy > 0) {
+            var rel = (ball.x-(paddle.x+paddle.w/2)) / (paddle.w/2);
+            ball.dx = rel * 5;
+            ball.dy = -Math.abs(ball.dy);
+        }
+
+        var left = 0;
+        bricks.forEach(function(b) {
+            if (!b.alive) return;
+            left++;
+            if (ball.x+ball.r > b.x && ball.x-ball.r < b.x+BW &&
+                ball.y+ball.r > b.y && ball.y-ball.r < b.y+BH) {
+                b.alive = false; left--;
+                ball.dy = -ball.dy;
+                score += 10;
+                document.getElementById('eg-score').textContent = score;
+            }
+        });
+        if (left === 0) gameState = 'won';
+
+        draw();
+        raf = requestAnimationFrame(update);
+    }
+
+    canvas.addEventListener('mousemove', function(e) {
+        var rect = canvas.getBoundingClientRect();
+        var scaleX = W / rect.width;
+        var mx = (e.clientX - rect.left) * scaleX;
+        paddle.x = Math.max(0, Math.min(W-paddle.w, mx-paddle.w/2));
+    });
+
+    document.addEventListener('keydown', function(e) {
+        keys[e.keyCode] = true;
+        if (e.keyCode === 82 && gameState !== 'playing') init();
+    });
+
+    var pill = document.getElementById('status-pill');
+    pill.addEventListener('click', showGame);
+    pill.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showGame(); }
+    });
+
+    document.addEventListener('keyup', function(e) {
+        keys[e.keyCode] = false;
+        if (e.keyCode === 27) hideGame();
+    });
+
+    function showGame() {
+        modal.classList.add('show');
+        init();
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(update);
+    }
+
+    function hideGame() {
+        modal.classList.remove('show');
+        cancelAnimationFrame(raf);
+    }
+
+    closeBtn.addEventListener('click', hideGame);
+    modal.addEventListener('click', function(e) { if (e.target === modal) hideGame(); });
 }());
 </script>
 </body>
