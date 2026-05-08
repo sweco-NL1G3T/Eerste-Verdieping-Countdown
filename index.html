@@ -58,28 +58,13 @@
         .sweco-mark {
             display: flex;
             align-items: center;
-            gap: 11px;
-            text-decoration: none;
         }
 
-        .sweco-logo-icon {
-            width: 38px;
-            height: 38px;
-            flex-shrink: 0;
-        }
-
-        .sweco-wordmark {
-            font-family: 'Poppins', sans-serif;
-            font-weight: 800;
-            font-size: 1.45rem;
-            color: var(--white);
-            letter-spacing: -0.03em;
-            line-height: 1;
-        }
-
-        .sweco-wordmark em {
-            font-style: normal;
-            color: var(--green);
+        .sweco-logo-img {
+            height: 34px;
+            width: auto;
+            display: block;
+            filter: brightness(0) invert(1);
         }
 
         .header-rule {
@@ -146,6 +131,19 @@
             text-align: center;
             position: relative;
             overflow: hidden;
+        }
+
+        .hero-watermark {
+            position: absolute;
+            bottom: -30px;
+            right: -30px;
+            width: 340px;
+            height: 340px;
+            background: url('sweco_logo.png') no-repeat center center;
+            background-size: contain;
+            opacity: 0.045;
+            filter: brightness(0) invert(1);
+            pointer-events: none;
         }
 
         .hero-grid {
@@ -519,14 +517,13 @@
             gap: 10px;
         }
 
-        .footer-brand {
-            font-family: 'Poppins', sans-serif;
-            font-weight: 800;
-            font-size: 1.05rem;
-            color: var(--white);
-            letter-spacing: -0.02em;
+        .footer-logo {
+            height: 28px;
+            width: auto;
+            display: block;
+            filter: brightness(0) invert(1);
+            opacity: 0.75;
         }
-        .footer-brand em { font-style: normal; color: var(--green); }
 
         .footer-copy {
             font-family: 'Open Sans', sans-serif;
@@ -574,17 +571,13 @@
 <!-- ── HEADER ──────────────────────────────────────────── -->
 <header role="banner">
     <div class="header-left">
-        <div class="sweco-mark" role="img" aria-label="Sweco logo">
-            <svg class="sweco-logo-icon" viewBox="0 0 38 38" fill="none" aria-hidden="true">
-                <rect width="38" height="38" rx="9" fill="#00A651"/>
-                <path d="M7 27 L13.5 13 L19 22.5 L24.5 15 L31 27" stroke="white" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-            </svg>
-            <span class="sweco-wordmark">Swe<em>co</em></span>
+        <div class="sweco-mark">
+            <img src="Sweco Logo_name.png" alt="Sweco" class="sweco-logo-img">
         </div>
         <div class="header-rule" aria-hidden="true"></div>
         <div class="header-meta">
             <div class="header-meta-top">Kantoor Alkmaar</div>
-            <div class="header-meta-bot">Alkmaar</div>
+            <div class="header-meta-bot">1e Verdieping</div>
         </div>
     </div>
     <div class="status-pill" aria-label="Status: In renovatie">
@@ -595,8 +588,9 @@
 
 <!-- ── HERO ────────────────────────────────────────────── -->
 <section class="hero" aria-labelledby="hero-heading">
-    <div class="hero-grid" aria-hidden="true"></div>
-    <div class="hero-glow"  aria-hidden="true"></div>
+    <div class="hero-grid"      aria-hidden="true"></div>
+    <div class="hero-glow"      aria-hidden="true"></div>
+    <div class="hero-watermark" aria-hidden="true"></div>
 
     <div class="hero-content">
         <div class="eyebrow" aria-hidden="true">
@@ -757,7 +751,9 @@
 
 <!-- ── FOOTER ──────────────────────────────────────────── -->
 <footer role="contentinfo">
-    <div class="footer-brand">Swe<em>co</em></div>
+    <div class="footer-brand">
+        <img src="Sweco Logo_name.png" alt="Sweco" class="footer-logo">
+    </div>
     <div class="footer-copy">&copy; 2026 Sweco Nederland B.V. &mdash; Kantoor Alkmaar</div>
 </footer>
 
