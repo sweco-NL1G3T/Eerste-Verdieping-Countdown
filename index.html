@@ -580,6 +580,20 @@
         }
         #easter-modal.show { display: flex; }
 
+        #runner-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            background: rgba(0, 18, 8, 0.88);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #runner-modal.show { display: flex; }
+
         .easter-box {
             background: var(--green-deep);
             border: 1px solid rgba(0,166,81,0.28);
@@ -655,7 +669,7 @@
 <!-- ── HEADER ──────────────────────────────────────────── -->
 <header role="banner">
     <div class="header-left">
-        <div class="sweco-mark">
+        <div class="sweco-mark" id="sweco-mark" role="button" tabindex="0" style="cursor:pointer" aria-label="Sweco logo">
             <img src="Sweco Logo_name.png" alt="Sweco" class="sweco-logo-img">
         </div>
         <div class="header-rule" aria-hidden="true"></div>
@@ -854,6 +868,22 @@
         </div>
         <canvas id="breakout" width="400" height="300"></canvas>
         <div class="easter-hint">Pijltjestoetsen of muis &nbsp;&bull;&nbsp; R = opnieuw &nbsp;&bull;&nbsp; Esc = sluiten</div>
+    </div>
+</div>
+
+<!-- ── RUNNER EASTER EGG ──────────────────────────────────── -->
+<div id="runner-modal" role="dialog" aria-modal="true" aria-labelledby="runner-title-lbl">
+    <div class="easter-box">
+        <div class="easter-header">
+            <div class="easter-title" id="runner-title-lbl">Renovatie Runner</div>
+            <button class="easter-close" id="runner-close" aria-label="Sluiten">&times;</button>
+        </div>
+        <div class="easter-hud">
+            <span>Score: <b id="rn-score">0</b></span>
+            <span>Best: <b id="rn-best">0</b></span>
+        </div>
+        <canvas id="runner-canvas" width="480" height="160"></canvas>
+        <div class="easter-hint">Klik, Spatie of &uarr; om te springen &nbsp;&bull;&nbsp; Esc = sluiten</div>
     </div>
 </div>
 
@@ -1100,6 +1130,237 @@
 
     closeBtn.addEventListener('click', hideGame);
     modal.addEventListener('click', function(e) { if (e.target === modal) hideGame(); });
+}());
+
+// ── EASTER EGG: RENOVATIE RUNNER ─────────────────────────
+(function () {
+    var modal    = document.getElementById('runner-modal');
+    var closeBtn = document.getElementById('runner-close');
+    var canvas   = document.getElementById('runner-canvas');
+    var ctx      = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+    var GY = H - 22; // ground y
+
+    var GRAVITY = 0.65, JUMP_V = -13;
+    var raf, state, frame, score, hiScore, speed;
+    var player, obstacles, gndOffset, legT;
+    hiScore = 0;
+
+    function init() {
+        state = 'idle'; frame = 0; score = 0; speed = 5;
+        gndOffset = 0; legT = 0; obstacles = [];
+        player = { x: 70, y: GY, w: 22, h: 38, vy: 0, onGround: true };
+        document.getElementById('rn-score').textContent = '0';
+    }
+
+    function jump() {
+        if (state === 'dead') { init(); state = 'playing'; return; }
+        if (state === 'idle') { state = 'playing'; }
+        if (player.onGround) { player.vy = JUMP_V; player.onGround = false; }
+    }
+
+    function drawPlayer() {
+        var x = player.x, top = player.y - player.h;
+        var leg = Math.sin(legT) > 0;
+
+        // Shadow
+        ctx.fillStyle = 'rgba(0,0,0,0.18)';
+        ctx.fillRect(x+2, GY+1, player.w-4, 4);
+
+        // Hard hat
+        ctx.fillStyle = '#F97316';
+        ctx.fillRect(x-2, top-7, player.w+4, 6);
+        ctx.fillRect(x+3, top-13, player.w-6, 7);
+
+        // Face
+        ctx.fillStyle = '#FBBF85';
+        ctx.fillRect(x+3, top, player.w-6, 11);
+        ctx.fillStyle = '#1E293B';
+        ctx.fillRect(x+6, top+3, 3, 3);
+        ctx.fillRect(x+13, top+3, 3, 3);
+
+        // Body — Sweco green + hi-vis stripe
+        ctx.fillStyle = '#00A651';
+        ctx.fillRect(x, top+11, player.w, 17);
+        ctx.fillStyle = '#FCD34D';
+        ctx.fillRect(x, top+17, player.w, 3);
+
+        // Legs
+        ctx.fillStyle = '#334155';
+        if (player.onGround) {
+            ctx.fillRect(x+2,  top+28, 8, leg ? 10 : 7);
+            ctx.fillRect(x+12, top+28, 8, leg ? 7  : 10);
+        } else {
+            ctx.fillRect(x+2,  top+28, 8, 7);
+            ctx.fillRect(x+12, top+28, 8, 7);
+        }
+    }
+
+    function drawCone(x, h) {
+        var bw = 22, bh = 7;
+        ctx.fillStyle = '#EA580C';
+        ctx.fillRect(x-bw/2, GY-bh, bw, bh);
+        ctx.beginPath();
+        ctx.moveTo(x-bw/2, GY-bh);
+        ctx.lineTo(x+bw/2, GY-bh);
+        ctx.lineTo(x+3, GY-h);
+        ctx.lineTo(x-3, GY-h);
+        ctx.closePath();
+        ctx.fillStyle = '#F97316'; ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.fillRect(x-7, GY-bh-h*0.48, 14, 4);
+    }
+
+    function drawBarrier(x, h, w) {
+        ctx.fillStyle = '#94A3B8';
+        ctx.fillRect(x+3,   GY-h, 5, h);
+        ctx.fillRect(x+w-8, GY-h, 5, h);
+        var y1 = GY-h+4, y2 = y1+h*0.42;
+        ctx.fillStyle = '#DC2626';
+        ctx.fillRect(x, y1, w, 8);
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(x+w*0.15, y1, w*0.22, 8);
+        ctx.fillRect(x+w*0.55, y1, w*0.22, 8);
+        ctx.fillStyle = '#DC2626';
+        ctx.fillRect(x, y2, w, 8);
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(x+w*0.08, y2, w*0.22, 8);
+        ctx.fillRect(x+w*0.48, y2, w*0.22, 8);
+    }
+
+    function drawOverlay(line1, line2, col) {
+        ctx.fillStyle = 'rgba(0,18,8,0.8)'; ctx.fillRect(0,0,W,H);
+        ctx.textAlign = 'center';
+        ctx.font = 'bold 20px Poppins,sans-serif';
+        ctx.fillStyle = col || '#00A651';
+        ctx.fillText(line1, W/2, H/2-12);
+        ctx.font = '12px Open Sans,sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.fillText(line2, W/2, H/2+12);
+        ctx.textAlign = 'left';
+    }
+
+    function draw() {
+        // Sky
+        ctx.fillStyle = '#001A0D'; ctx.fillRect(0,0,W,H);
+
+        // Stars
+        ctx.fillStyle = 'rgba(255,255,255,0.28)';
+        [[45,14],[130,8],[220,22],[340,6],[430,18],[380,35],[90,38]].forEach(function(s){
+            ctx.fillRect(s[0],s[1],2,2);
+        });
+
+        // Ground
+        ctx.fillStyle = '#006B35'; ctx.fillRect(0,GY,W,H-GY);
+        ctx.fillStyle = 'rgba(0,200,100,0.4)';
+        for (var gx = -gndOffset; gx < W; gx += 26) { ctx.fillRect(gx,GY,13,2); }
+
+        // Obstacles
+        obstacles.forEach(function(o) {
+            if (o.type === 'cone')    drawCone(o.x+o.w/2, o.h);
+            else                      drawBarrier(o.x, o.h, o.w);
+        });
+
+        drawPlayer();
+
+        // Score flash every 100pts
+        if (score > 0 && score % 100 === 0 && frame % 20 < 10) {
+            ctx.fillStyle = 'rgba(0,166,81,0.18)'; ctx.fillRect(0,0,W,H);
+        }
+
+        if (state === 'idle') {
+            drawOverlay('Klik of druk Spatie om te starten', 'Spring over de obstakels!', '#00A651');
+        }
+        if (state === 'dead') {
+            drawOverlay('Gebotst!', 'Score: '+score+' • Klik of Spatie om opnieuw te spelen', '#DC2626');
+        }
+    }
+
+    function update() {
+        if (state === 'playing') {
+            frame++;
+            speed = 5 + frame / 350;
+            score = Math.floor(frame / 7);
+            if (score > hiScore) hiScore = score;
+            if (frame % 3 === 0) {
+                document.getElementById('rn-score').textContent = score;
+                document.getElementById('rn-best').textContent  = hiScore;
+            }
+
+            gndOffset = (gndOffset + speed) % 26;
+            if (player.onGround) legT += speed * 0.13;
+
+            // Physics
+            if (!player.onGround) {
+                player.vy += GRAVITY;
+                player.y  += player.vy;
+                if (player.y >= GY) { player.y = GY; player.vy = 0; player.onGround = true; }
+            }
+
+            // Spawn
+            var interval = Math.max(52, 88 - frame/55);
+            if (frame % Math.floor(interval) === 0) {
+                var type = Math.random() < 0.62 ? 'cone' : 'barrier';
+                obstacles.push({
+                    type: type, x: W+10,
+                    w: type === 'cone' ? 22 : 30,
+                    h: type === 'cone' ? (28+Math.random()*18) : (42+Math.random()*12)
+                });
+            }
+
+            // Move + collide
+            for (var i = obstacles.length-1; i >= 0; i--) {
+                obstacles[i].x -= speed;
+                if (obstacles[i].x + obstacles[i].w < 0) { obstacles.splice(i,1); continue; }
+                var o = obstacles[i];
+                if (player.x + player.w - 5 > o.x + 3 &&
+                    player.x + 5 < o.x + o.w - 3 &&
+                    player.y > GY - o.h) {
+                    state = 'dead';
+                    document.getElementById('rn-score').textContent = score;
+                    document.getElementById('rn-best').textContent  = hiScore;
+                }
+            }
+        }
+
+        draw();
+        raf = requestAnimationFrame(update);
+    }
+
+    // Input
+    canvas.addEventListener('click', jump);
+    canvas.addEventListener('touchstart', function(e){ e.preventDefault(); jump(); }, { passive: false });
+
+    document.addEventListener('keydown', function(e) {
+        if (!modal.classList.contains('show')) return;
+        if (e.keyCode === 32 || e.keyCode === 38) { e.preventDefault(); jump(); }
+    });
+
+    function showRunner() {
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+        init();
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(update);
+    }
+    function hideRunner() {
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+        cancelAnimationFrame(raf);
+    }
+
+    closeBtn.addEventListener('click', hideRunner);
+    modal.addEventListener('click', function(e){ if (e.target === modal) hideRunner(); });
+
+    document.addEventListener('keyup', function(e) {
+        if (e.keyCode === 27 && modal.classList.contains('show')) hideRunner();
+    });
+
+    var mark = document.getElementById('sweco-mark');
+    mark.addEventListener('click', showRunner);
+    mark.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showRunner(); }
+    });
 }());
 </script>
 </body>
