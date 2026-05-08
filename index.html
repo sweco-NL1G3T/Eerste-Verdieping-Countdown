@@ -1,41 +1,843 @@
 <!DOCTYPE html>
-<html>
+<html lang="nl">
 <head>
-  <meta charset="UTF-8">
-  <title>Countdown</title>
-  <style>
-    body {
-      font-family: Segoe UI, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: #1f1f1f;
-      color: white;
-      font-size: 48px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Aftellen naar de opening van de 1e Verdieping — Sweco Urban Projects Alkmaar">
+    <title>1e Verdieping | Sweco Alkmaar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --green:      #00A651;
+            --green-dark: #006B35;
+            --green-deep: #002D1A;
+            --green-tint: #E8F5EE;
+            --green-lite: #F0F7F3;
+            --white:      #FFFFFF;
+            --text:       #1E293B;
+            --muted:      #64748B;
+            --border:     #C8E0D4;
+            --shadow:     0 4px 24px rgba(0, 107, 53, 0.10);
+            --shadow-lg:  0 8px 40px rgba(0, 107, 53, 0.16);
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: var(--green-lite);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ── HEADER ─────────────────────────────────────── */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(0, 45, 26, 0.97);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(0, 166, 81, 0.18);
+            padding: 0 40px;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .sweco-mark {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            text-decoration: none;
+        }
+
+        .sweco-logo-icon {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+        }
+
+        .sweco-wordmark {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 1.45rem;
+            color: var(--white);
+            letter-spacing: -0.03em;
+            line-height: 1;
+        }
+
+        .sweco-wordmark em {
+            font-style: normal;
+            color: var(--green);
+        }
+
+        .header-rule {
+            width: 1px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .header-meta {
+            line-height: 1.3;
+        }
+
+        .header-meta-top {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--white);
+            letter-spacing: 0.01em;
+        }
+
+        .header-meta-bot {
+            font-family: 'Open Sans', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 166, 81, 0.12);
+            border: 1px solid rgba(0, 166, 81, 0.28);
+            color: var(--green);
+            font-family: 'Open Sans', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 7px 16px;
+            border-radius: 99px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--green);
+            border-radius: 50%;
+            flex-shrink: 0;
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.35; }
+        }
+
+        /* ── HERO ───────────────────────────────────────── */
+        .hero {
+            background: linear-gradient(160deg, var(--green-deep) 0%, #00391e 55%, #00501f 100%);
+            padding: 88px 40px 72px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0,166,81,0.055) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,166,81,0.055) 1px, transparent 1px);
+            background-size: 52px 52px;
+        }
+
+        .hero-glow {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 700px;
+            height: 500px;
+            background: radial-gradient(ellipse, rgba(0,166,81,0.14) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            background: rgba(0,166,81,0.11);
+            border: 1px solid rgba(0,166,81,0.24);
+            color: var(--green);
+            font-family: 'Open Sans', sans-serif;
+            font-size: 0.74rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 8px 20px;
+            border-radius: 99px;
+            margin-bottom: 32px;
+        }
+
+        .eyebrow-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: blink 2.4s ease-in-out infinite;
+        }
+
+        .hero-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: clamp(2.1rem, 5.5vw, 3.8rem);
+            color: var(--white);
+            line-height: 1.12;
+            letter-spacing: -0.025em;
+            margin-bottom: 18px;
+        }
+
+        .hero-title .hl { color: var(--green); }
+
+        .hero-desc {
+            font-family: 'Open Sans', sans-serif;
+            font-size: 1.05rem;
+            color: rgba(255,255,255,0.6);
+            line-height: 1.75;
+            max-width: 500px;
+            margin: 0 auto 60px;
+        }
+
+        .hero-desc strong { color: rgba(255,255,255,0.9); font-weight: 600; }
+
+        /* ── COUNTDOWN ──────────────────────────────────── */
+        .countdown {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .cd-block { display: flex; flex-direction: column; align-items: center; }
+
+        .cd-card {
+            width: 148px;
+            height: 148px;
+            background: rgba(255,255,255,0.055);
+            border: 1px solid rgba(0,166,81,0.22);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(6px);
+        }
+
+        /* subtle top-shine */
+        .cd-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255,255,255,0.055) 0%, transparent 50%);
+            border-radius: 20px;
+        }
+
+        /* divider line */
+        .cd-card::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 12px;
+            right: 12px;
+            height: 1px;
+            background: rgba(0,0,0,0.18);
+        }
+
+        .cd-num {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 4.6rem;
+            color: var(--white);
+            line-height: 1;
+            letter-spacing: -0.05em;
+            position: relative;
+            z-index: 1;
+            will-change: transform, opacity;
+        }
+
+        .cd-num.flip { animation: flipIn 0.32s ease-out; }
+
+        @keyframes flipIn {
+            0%   { opacity: 0.3; transform: translateY(-10px) scale(0.94); }
+            100% { opacity: 1;   transform: translateY(0)    scale(1); }
+        }
+
+        .cd-label {
+            font-family: 'Open Sans', sans-serif;
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: rgba(255,255,255,0.45);
+            margin-top: 14px;
+        }
+
+        .cd-sep {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3.2rem;
+            font-weight: 300;
+            color: rgba(255,255,255,0.18);
+            line-height: 1;
+            padding-top: 38px;
+            user-select: none;
+        }
+
+        /* ── PROGRESS ───────────────────────────────────── */
+        .progress-wrap {
+            padding: 52px 40px 20px;
+            max-width: 780px;
+            margin: 0 auto;
+        }
+
+        .section-eyebrow {
+            font-family: 'Open Sans', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--green-dark);
+            margin-bottom: 10px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 14px;
+        }
+
+        .progress-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text);
+        }
+
+        .progress-pct-val {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 2rem;
+            color: var(--green);
+            line-height: 1;
+        }
+
+        .progress-track {
+            background: var(--border);
+            border-radius: 99px;
+            height: 12px;
+            overflow: visible;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--green-dark) 0%, var(--green) 100%);
+            border-radius: 99px;
+            transition: width 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            right: -5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 22px;
+            height: 22px;
+            background: var(--green);
+            border-radius: 50%;
+            border: 3px solid var(--white);
+            box-shadow: 0 0 0 2px var(--green), var(--shadow);
+        }
+
+        .progress-dates {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Open Sans', sans-serif;
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+
+        .progress-dates .center {
+            font-weight: 700;
+            color: var(--green-dark);
+        }
+
+        /* ── INFO CARDS ─────────────────────────────────── */
+        .cards-wrap {
+            padding: 32px 40px 72px;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .info-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            box-shadow: var(--shadow);
+            transition: transform 0.22s ease, box-shadow 0.22s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--green-tint);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--green-dark);
+            flex-shrink: 0;
+        }
+
+        .card-icon svg { width: 24px; height: 24px; }
+
+        .card-label {
+            font-family: 'Open Sans', sans-serif;
+            font-size: 0.69rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .card-value {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text);
+            line-height: 1.35;
+        }
+
+        .card-sub {
+            font-family: 'Open Sans', sans-serif;
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        /* ── CELEBRATION ────────────────────────────────── */
+        .celebration {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: var(--green-deep);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+        }
+        .celebration.show { display: flex; }
+
+        .celebration-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: clamp(2.2rem, 6vw, 4.2rem);
+            color: var(--white);
+            line-height: 1.15;
+            margin-bottom: 20px;
+        }
+
+        .celebration-title em {
+            font-style: normal;
+            color: var(--green);
+        }
+
+        .celebration-sub {
+            font-family: 'Open Sans', sans-serif;
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.62);
+            line-height: 1.7;
+        }
+
+        .celebration-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(0,166,81,0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 32px;
+            color: var(--green);
+        }
+        .celebration-icon svg { width: 40px; height: 40px; }
+
+        /* ── FOOTER ─────────────────────────────────────── */
+        footer {
+            background: var(--green-deep);
+            padding: 28px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .footer-brand {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 1.05rem;
+            color: var(--white);
+            letter-spacing: -0.02em;
+        }
+        .footer-brand em { font-style: normal; color: var(--green); }
+
+        .footer-copy {
+            font-family: 'Open Sans', sans-serif;
+            font-size: 0.76rem;
+            color: rgba(255,255,255,0.38);
+        }
+
+        /* ── RESPONSIVE ─────────────────────────────────── */
+        @media (max-width: 768px) {
+            header { padding: 0 20px; }
+            .status-pill { display: none; }
+
+            .hero { padding: 60px 20px 52px; }
+
+            .cd-card { width: 76px; height: 88px; border-radius: 14px; }
+            .cd-num  { font-size: 2.5rem; }
+            .cd-sep  { font-size: 2rem; padding-top: 24px; }
+            .cd-label { margin-top: 10px; }
+
+            .cards-grid { grid-template-columns: 1fr; }
+            .cards-wrap, .progress-wrap { padding-left: 20px; padding-right: 20px; }
+
+            footer { flex-direction: column; text-align: center; padding: 24px 20px; }
+        }
+
+        @media (max-width: 480px) {
+            .cd-card { width: 62px; height: 72px; border-radius: 11px; }
+            .cd-num  { font-size: 2rem; }
+            .cd-sep  { font-size: 1.6rem; padding-top: 18px; }
+            .countdown { gap: 10px; }
+        }
+
+        @media (min-width: 769px) and (max-width: 1023px) {
+            .cards-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .cd-num.flip, .status-dot, .eyebrow-dot { animation: none; }
+            .progress-fill { transition: none; }
+        }
+    </style>
 </head>
 <body>
-  <div id="timer"></div>
 
-  <script>
-    const target = new Date("2026-12-31T00:00:00");
+<!-- ── HEADER ──────────────────────────────────────────── -->
+<header role="banner">
+    <div class="header-left">
+        <div class="sweco-mark" role="img" aria-label="Sweco logo">
+            <svg class="sweco-logo-icon" viewBox="0 0 38 38" fill="none" aria-hidden="true">
+                <rect width="38" height="38" rx="9" fill="#00A651"/>
+                <path d="M7 27 L13.5 13 L19 22.5 L24.5 15 L31 27" stroke="white" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+            <span class="sweco-wordmark">Swe<em>co</em></span>
+        </div>
+        <div class="header-rule" aria-hidden="true"></div>
+        <div class="header-meta">
+            <div class="header-meta-top">Urban Projects</div>
+            <div class="header-meta-bot">Alkmaar</div>
+        </div>
+    </div>
+    <div class="status-pill" aria-label="Status: In renovatie">
+        <span class="status-dot" aria-hidden="true"></span>
+        In Renovatie
+    </div>
+</header>
 
-    setInterval(() => {
-      const now = new Date();
-      let diff = target - now;
+<!-- ── HERO ────────────────────────────────────────────── -->
+<section class="hero" aria-labelledby="hero-heading">
+    <div class="hero-grid" aria-hidden="true"></div>
+    <div class="hero-glow"  aria-hidden="true"></div>
 
-      if (diff < 0) diff = 0;
+    <div class="hero-content">
+        <div class="eyebrow" aria-hidden="true">
+            <span class="eyebrow-dot"></span>
+            Renovatie Voortgang
+        </div>
 
-      const d = Math.floor(diff / (1000*60*60*24));
-      const h = Math.floor(diff / (1000*60*60) % 24);
-      const m = Math.floor(diff / (1000*60) % 60);
-      const s = Math.floor(diff / 1000 % 60);
+        <h1 class="hero-title" id="hero-heading">
+            Aftellen naar de<br>
+            <span class="hl">1e Verdieping</span>
+        </h1>
 
-      document.getElementById("timer").innerText =
-        `${d} : ${h} : ${m} : ${s}`;
-    }, 1000);
-  </script>
+        <p class="hero-desc">
+            De renovatie van onze eerste verdieping is in volle gang.
+            Op <strong>27 juli 2026</strong> zijn we klaar om onze
+            nieuwe werkplek in gebruik te nemen.
+        </p>
+
+        <div
+            class="countdown"
+            role="timer"
+            aria-live="off"
+            aria-label="Afteltimer: tijd tot 27 juli 2026"
+        >
+            <div class="cd-block">
+                <div class="cd-card">
+                    <span class="cd-num" id="cd-days">--</span>
+                </div>
+                <span class="cd-label" aria-hidden="true">Dagen</span>
+            </div>
+
+            <span class="cd-sep" aria-hidden="true">:</span>
+
+            <div class="cd-block">
+                <div class="cd-card">
+                    <span class="cd-num" id="cd-hours">--</span>
+                </div>
+                <span class="cd-label" aria-hidden="true">Uren</span>
+            </div>
+
+            <span class="cd-sep" aria-hidden="true">:</span>
+
+            <div class="cd-block">
+                <div class="cd-card">
+                    <span class="cd-num" id="cd-mins">--</span>
+                </div>
+                <span class="cd-label" aria-hidden="true">Minuten</span>
+            </div>
+
+            <span class="cd-sep" aria-hidden="true">:</span>
+
+            <div class="cd-block">
+                <div class="cd-card">
+                    <span class="cd-num" id="cd-secs">--</span>
+                </div>
+                <span class="cd-label" aria-hidden="true">Seconden</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── PROGRESS BAR ─────────────────────────────────────── -->
+<section class="progress-wrap" aria-labelledby="progress-heading">
+    <div class="section-eyebrow">Voortgang</div>
+    <div class="progress-header">
+        <h2 class="progress-title" id="progress-heading">Naar de opening</h2>
+        <div class="progress-pct-val" id="pct-val" aria-live="polite" aria-atomic="true">0%</div>
+    </div>
+    <div class="progress-track">
+        <div
+            class="progress-fill"
+            id="prog-fill"
+            role="progressbar"
+            aria-valuenow="0"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-label="Voortgang renovatieperiode"
+            style="width:0%"
+        ></div>
+    </div>
+    <div class="progress-dates">
+        <span>1 jan 2026</span>
+        <span class="center" id="days-left-txt" aria-live="polite"></span>
+        <span>27 jul 2026</span>
+    </div>
+</section>
+
+<!-- ── INFO CARDS ──────────────────────────────────────── -->
+<section class="cards-wrap" aria-label="Projectinformatie">
+    <div class="cards-grid">
+
+        <!-- Locatie -->
+        <div class="info-card">
+            <div class="card-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+            </div>
+            <div>
+                <div class="card-label">Locatie</div>
+                <div class="card-value">Sweco Alkmaar</div>
+                <div class="card-sub">1e Verdieping — Nieuw ingerichte werkplek</div>
+            </div>
+        </div>
+
+        <!-- Oplevering -->
+        <div class="info-card">
+            <div class="card-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8"  y1="2" x2="8"  y2="6"/>
+                    <line x1="3"  y1="10" x2="21" y2="10"/>
+                    <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>
+                </svg>
+            </div>
+            <div>
+                <div class="card-label">Oplevering</div>
+                <div class="card-value">27 juli 2026</div>
+                <div class="card-sub">Verwachte ingebruikname</div>
+            </div>
+        </div>
+
+        <!-- Project -->
+        <div class="info-card">
+            <div class="card-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+            </div>
+            <div>
+                <div class="card-label">Project</div>
+                <div class="card-value">Renovatie &amp; Herinrichting</div>
+                <div class="card-sub">Urban Projects — Sweco Alkmaar</div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ── CELEBRATION OVERLAY ─────────────────────────────── -->
+<div class="celebration" id="celebration" role="alertdialog" aria-labelledby="celeb-title" aria-modal="true">
+    <div class="celebration-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+        </svg>
+    </div>
+    <h2 class="celebration-title" id="celeb-title">
+        Welkom op de<br>
+        <em>1e Verdieping!</em>
+    </h2>
+    <p class="celebration-sub">
+        Het is zover — onze nieuwe werkplek is gereed.<br>
+        Sweco Urban Projects Alkmaar
+    </p>
+</div>
+
+<!-- ── FOOTER ──────────────────────────────────────────── -->
+<footer role="contentinfo">
+    <div class="footer-brand">Swe<em>co</em></div>
+    <div class="footer-copy">&copy; 2026 Sweco Nederland B.V. &mdash; Urban Projects Alkmaar</div>
+</footer>
+
+<script>
+(function () {
+    'use strict';
+
+    var TARGET = new Date('2026-07-27T00:00:00');
+    var START  = new Date('2026-01-01T00:00:00');
+
+    var elDays  = document.getElementById('cd-days');
+    var elHours = document.getElementById('cd-hours');
+    var elMins  = document.getElementById('cd-mins');
+    var elSecs  = document.getElementById('cd-secs');
+    var elFill  = document.getElementById('prog-fill');
+    var elPct   = document.getElementById('pct-val');
+    var elLeft  = document.getElementById('days-left-txt');
+    var elCel   = document.getElementById('celebration');
+
+    var noMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var timer;
+
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+    function setNum(el, val) {
+        var s = pad(val);
+        if (el.textContent === s) return;
+        el.textContent = s;
+        if (!noMotion) {
+            el.classList.remove('flip');
+            void el.offsetWidth;
+            el.classList.add('flip');
+        }
+    }
+
+    function tick() {
+        var now  = new Date();
+        var diff = TARGET - now;
+
+        if (diff <= 0) {
+            elDays.textContent  = '00';
+            elHours.textContent = '00';
+            elMins.textContent  = '00';
+            elSecs.textContent  = '00';
+            elFill.style.width  = '100%';
+            elFill.setAttribute('aria-valuenow', '100');
+            elPct.textContent   = '100%';
+            elLeft.textContent  = 'Geopend!';
+            elCel.classList.add('show');
+            clearInterval(timer);
+            return;
+        }
+
+        var total = Math.floor(diff / 1000);
+        var d = Math.floor(total / 86400);
+        var h = Math.floor((total % 86400) / 3600);
+        var m = Math.floor((total % 3600) / 60);
+        var s = total % 60;
+
+        setNum(elDays,  d);
+        setNum(elHours, h);
+        setNum(elMins,  m);
+        setNum(elSecs,  s);
+
+        var range   = TARGET - START;
+        var elapsed = now - START;
+        var pct     = Math.min(100, Math.max(0, elapsed / range * 100));
+        var pctDisp = Math.round(pct * 10) / 10;
+
+        elFill.style.width = pct + '%';
+        elFill.setAttribute('aria-valuenow', Math.round(pct));
+        elPct.textContent  = pctDisp + '%';
+
+        var dLeft = Math.ceil(diff / 86400000);
+        elLeft.textContent = dLeft === 1 ? '1 dag te gaan' : dLeft + ' dagen te gaan';
+    }
+
+    tick();
+    timer = setInterval(tick, 1000);
+}());
+</script>
 </body>
 </html>
